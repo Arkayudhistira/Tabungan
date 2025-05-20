@@ -12,44 +12,104 @@
                     @php
                         $user = auth()->user();
                     @endphp
-
-                    @if ($user->role_id === 1) {{-- Admin --}}
-                    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Dashboard Admin</h2>
-
-                    <div class="mb-6">
-                        <a href="{{ route('admin.riwayat') }}"
-                           class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded shadow-md transition">
-                            Lihat Semua Riwayat Tabungan
-                        </a>
+                    @if(session('success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline">{{ session('success') }}</span>
                     </div>
+                @endif
 
-                    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Saldo</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                @foreach(\App\Models\User::with('tabungan')->get() as $user)
-                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-900">
-                                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{{ $user->role }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap font-semibold text-green-600 dark:text-green-400">
-                                            Rp{{ number_format($user->tabungan->sum('jumlah'), 0, ',', '.') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                @if(session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline">{{ session('error') }}</span>
                     </div>
+                @endif
+
+
+@if ($user->role_id === 1) {{-- Admin --}}
+<h2 class="text-xl font-bold mb-4">Dashboard Admin Hitam</h2>
+
+<table class="w-full border border-gray-500 text-sm mb-8">
+    <thead class="bg-gray-700 text-white sticky top-0">
+        <tr>
+            <th class="border p-2">Nama Siswa</th>
+            <th class="border p-2">Jenis</th>
+            <th class="border p-2">Jumlah</th>
+            <th class="border p-2">Status</th>
+            <th class="border p-2">Tanggal</th>
+            <th class="border p-2">Disetujui Oleh</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(\App\Models\AjuanTabungan::with(['user', 'approvedBy'])->orderBy('created_at', 'desc')->get() as $ajuan)
+            <tr class="bg-gray-100 dark:bg-gray-900">
+                <td class="border p-2">{{ $ajuan->user->name }}</td>
+                <td class="border p-2 capitalize">{{ $ajuan->jenis }}</td>
+                <td class="border p-2">Rp{{ number_format($ajuan->jumlah, 0, ',', '.') }}</td>
+                <td class="border p-2 capitalize">{{ $ajuan->status }}</td>
+                <td class="border p-2">{{ $ajuan->created_at->format('d M Y') }}</td>
+                <td class="border p-2">
+                    {{ $ajuan->approvedBy ? $ajuan->approvedBy->name : '-' }}
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+<table class="w-full border border-gray-500 text-sm mb-8">
+    <thead class="bg-gray-700 text-white">
+        <tr>
+            <th class="border p-2">Nama</th>
+            <th class="border p-2">Role</th>
+            <th class="border p-2">Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(\App\Models\User::with('tabungan')->get() as $u)
+            <tr class="bg-gray-100 dark:bg-gray-900">
+                <td class="border p-2">{{ $u->name }}</td>
+                <td class="border p-2">{{ $u->role }}</td>
+                <td class="border p-2">Rp{{ number_format($u->tabungan->sum('jumlah'), 0, ',', '.') }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+<h2 class="text-xl font-bold mb-4 mt-8">Riwayat Semua Ajuan Tabungan</h2>
+<div class="overflow-x-auto max-h-96 overflow-y-auto border rounded">
+    <table class="w-full border border-gray-500 text-sm">
+        <thead class="bg-gray-700 text-white sticky top-0">
+            <tr>
+                <th class="border p-2">Nama Siswa</th>
+                <th class="border p-2">Jenis</th>
+                <th class="border p-2">Jumlah</th>
+                <th class="border p-2">Status</th>
+                <th class="border p-2">Tanggal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(\App\Models\AjuanTabungan::with('user')->orderBy('created_at', 'desc')->get() as $ajuan)
+                <tr class="bg-gray-100 dark:bg-gray-900">
+                    <td class="border p-2">{{ $ajuan->user->name }}</td>
+                    <td class="border p-2 capitalize">{{ $ajuan->jenis }}</td>
+                    <td class="border p-2">Rp{{ number_format($ajuan->jumlah, 0, ',', '.') }}</td>
+                    <td class="border p-2 capitalize">{{ $ajuan->status }}</td>
+                    <td class="border p-2">{{ $ajuan->created_at->format('d M Y') }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
+
+
 
 
                     @elseif ($user->role_id === 2) {{-- Guru --}}
                         <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Dashboard Guru</h2>
                         <p class="text-gray-700 dark:text-gray-300 mb-4">Selamat datang, {{ $user->name }}!</p>
+
 
                         <h2 class="text-xl font-bold mt-6 mb-4 text-gray-800 dark:text-gray-100">Permintaan Tabungan</h2>
 

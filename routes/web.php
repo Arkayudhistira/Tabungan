@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AjuanController;
 use App\Http\Controllers\ProfileController;
 
+
 Route::get('/', function () {
     return view('welcome');
 });

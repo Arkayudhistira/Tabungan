@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -11,18 +12,23 @@ class AjuanController extends Controller
     public function setujui($id)
     {
         $ajuan = AjuanTabungan::findOrFail($id);
+
+        if ($ajuan->status !== 'pending') {
+            return redirect()->back()->with('error', 'Ajuan sudah diproses sebelumnya.');
+        }
+
         $ajuan->status = 'success';
+        $ajuan->approved_by = Auth::id();
         $ajuan->save();
 
-        // Jika ajuan tarik, jumlah disimpan negatif supaya saldo berkurang
         $jumlah = $ajuan->jenis === 'tarik' ? -abs($ajuan->jumlah) : abs($ajuan->jumlah);
 
-        \App\Models\Tabungan::create([
+        Tabungan::create([
             'user_id' => $ajuan->user_id,
             'jumlah' => $jumlah,
         ]);
 
-        return back()->with('success', 'Ajuan berhasil disetujui!');
+        return redirect()->back()->with('success', 'Ajuan berhasil disetujui!');
     }
 
     public function store(Request $request)
@@ -39,15 +45,21 @@ class AjuanController extends Controller
             'status' => 'pending',
         ]);
 
-        return back()->with('success', 'Ajuan berhasil dikirim.');
+        return redirect()->back()->with('success', 'Ajuan berhasil dikirim.');
     }
+
     public function tolak($id)
-{
-    $ajuan = AjuanTabungan::findOrFail($id);
-    $ajuan->status = 'rejected';  // atau 'tolak' sesuai kebutuhan
-    $ajuan->save();
+    {
+        $ajuan = AjuanTabungan::findOrFail($id);
 
-    return redirect()->back()->with('success', 'Ajuan berhasil ditolak.');
-}
+        // Cek status dulu, hanya bisa tolak jika status pending
+        if ($ajuan->status !== 'pending') {
+            return redirect()->back()->with('error', 'Ajuan sudah diproses sebelumnya.');
+        }
 
+        $ajuan->status = 'rejected'; // atau 'tolak' kalau mau
+        $ajuan->save();
+
+        return redirect()->back()->with('success', 'Ajuan berhasil ditolak.');
+    }
 }
