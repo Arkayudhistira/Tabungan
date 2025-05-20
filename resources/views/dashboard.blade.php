@@ -14,25 +14,38 @@
                     @endphp
 
                     @if ($user->role_id === 1) {{-- Admin --}}
-                        <h2 class="text-xl font-bold mb-4">Dashboard Admin Hitam</h2>
-                        <table class="w-full border border-gray-500 text-sm">
-                            <thead class="bg-gray-700 text-white">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Dashboard Admin</h2>
+
+                    <div class="mb-6">
+                        <a href="{{ route('admin.riwayat') }}"
+                           class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 rounded shadow-md transition">
+                            Lihat Semua Riwayat Tabungan
+                        </a>
+                    </div>
+
+                    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th class="border p-2">Nama</th>
-                                    <th class="border p-2">Role</th>
-                                    <th class="border p-2">Saldo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total Saldo</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach(\App\Models\User::with('tabungan')->get() as $u)
-                                    <tr class="bg-gray-100 dark:bg-gray-900">
-                                        <td class="border p-2">{{ $u->name }}</td>
-                                        <td class="border p-2">{{ $u->role }}</td>
-                                        <td class="border p-2">Rp{{ number_format($u->tabungan->sum('jumlah'), 0, ',', '.') }}</td>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach(\App\Models\User::with('tabungan')->get() as $user)
+                                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-900">
+                                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100">{{ $user->name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">{{ $user->role }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap font-semibold text-green-600 dark:text-green-400">
+                                            Rp{{ number_format($user->tabungan->sum('jumlah'), 0, ',', '.') }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+
 
                     @elseif ($user->role_id === 2) {{-- Guru --}}
                         <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Dashboard Guru</h2>

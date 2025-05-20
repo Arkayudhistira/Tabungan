@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AjuanController;
 use App\Http\Controllers\ProfileController;
 
@@ -29,6 +30,9 @@ Route::middleware(['auth'])->get('/dashboard', function () {
 })->name('dashboard');
 
 Route::put('/ajuan/{id}/tolak', [AjuanController::class, 'tolak'])->name('ajuan.tolak');
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('admin/riwayat', [AdminController::class, 'riwayat'])->name('admin.riwayat');
+});
 
 
 
