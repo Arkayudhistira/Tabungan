@@ -3,9 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -58,6 +59,11 @@ class User extends Authenticatable
 public function getRoleAttribute()
 {
     return $this->belongsTo(Role::class, 'role_id')->first()?->name; // misal nama role disimpan di kolom "name"
+}
+
+public function ajuanTabungan()
+{
+    return $this->hasMany(AjuanTabungan::class);
 }
 
 

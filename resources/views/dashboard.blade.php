@@ -13,7 +13,7 @@
                         $user = auth()->user();
                     @endphp
 
-                    @if ($user->role_id === 1) <!-- Misalnya 1 untuk admin -->
+                    @if ($user->role_id === 1) {{-- Admin --}}
                         <h2 class="text-xl font-bold mb-4">Dashboard Admin Hitam</h2>
                         <table class="w-full border border-gray-500 text-sm">
                             <thead class="bg-gray-700 text-white">
@@ -34,20 +34,115 @@
                             </tbody>
                         </table>
 
-                    @elseif ($user->role_id === 2) <!-- Misalnya 2 untuk guru -->
-                        <h2 class="text-xl font-bold mb-4">Dashboard Guru</h2>
-                        <p>Selamat datang, {{ $user->name }}! Fitur khusus guru akan segera tersedia.</p>
-                        <h2 class="text-xl font-bold mb-4">Permintaan Tabungan</h2>
-                        <!-- Tempatkan fitur permintaan tabungan untuk guru di sini -->
+                    @elseif ($user->role_id === 2) {{-- Guru --}}
+                        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Dashboard Guru</h2>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">Selamat datang, {{ $user->name }}!</p>
 
-                    @else
+                        <h2 class="text-xl font-bold mt-6 mb-4 text-gray-800 dark:text-gray-100">Permintaan Tabungan</h2>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white dark:bg-gray-800 shadow rounded-lg">
+                                <thead>
+                                    <tr class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100">
+                                        <th class="px-4 py-2 border">Nama Siswa</th>
+                                        <th class="px-4 py-2 border">Jenis</th>
+                                        <th class="px-4 py-2 border">Jumlah</th>
+                                        <th class="px-4 py-2 border">Status</th>
+                                        <th class="px-4 py-2 border">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse(App\Models\AjuanTabungan::where('status', 'pending')->with('user')->get() as $ajuan)
+                                        <tr class="text-gray-800 dark:text-gray-100">
+                                            <td class="border px-4 py-2">{{ $ajuan->user->name }}</td>
+                                            <td class="border px-4 py-2 capitalize">{{ $ajuan->jenis }}</td>
+                                            <td class="border px-4 py-2">Rp{{ number_format($ajuan->jumlah, 0, ',', '.') }}</td>
+                                            <td class="border px-4 py-2 capitalize">{{ $ajuan->status }}</td>
+                                            <td class="border px-4 py-2">
+                                                <div class="flex justify-end space-x-2">
+                                                    <form action="{{ route('ajuan.setujui', $ajuan->id) }}" method="POST" class="inline-block">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
+                                                            Setujui
+                                                        </button>
+                                                    </form>
+
+                                                    <form action="{{ route('ajuan.tolak', $ajuan->id) }}" method="POST" style="display:inline">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded ml-2">
+                                                            Tolak
+                                                        </button>
+                                                    </form>
+
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-gray-500 dark:text-gray-400 py-4">Tidak ada ajuan.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    @else {{-- Siswa --}}
                         <h2 class="text-xl font-bold mb-4">Dashboard Siswa</h2>
-                        <p>Halo {{ $user->name }}! Saldo tabungan kamu saat ini:</p>
-                        <p class="text-lg font-semibold mt-2">Rp{{ number_format($user->tabungan->sum('jumlah'), 0, ',', '.') }}</p>
+                        <p class="mb-2 text-gray-700 dark:text-gray-300">Saldo tabungan kamu saat ini:</p>
+                        <p class="text-2xl font-semibold text-green-600 dark:text-green-400 mb-6">
+                            Rp{{ number_format($user->tabungan->sum('jumlah'), 0, ',', '.') }}
+                        </p>
 
+                        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Ajukan Tabungan</h2>
+
+                        <form action="{{ route('ajuan.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded p-6 max-w-md">
+                            @csrf
+                            <div class="mb-4">
+                                <label class="block text-gray-700 dark:text-gray-200 font-bold mb-2">Jenis Ajuan</label>
+                                <select name="jenis" class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required class="...">
+                                    <option value="setor">Setor</option>
+                                    <option value="tarik">Tarik</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 dark:text-gray-200 font-bold mb-2">Jumlah</label>
+                                <input type="number" name="jumlah" class="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" placeholder="Masukkan jumlah..." required min="1">
+                            </div>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Kirim Ajuan
+                            </button>
+                        </form>
+
+
+
+                        <h3 class="text-lg font-bold mt-6 mb-2 text-gray-800 dark:text-gray-100">Riwayat Tabungan</h3>
+
+                        <table class="min-w-full bg-white dark:bg-gray-800 shadow rounded-lg">
+                            <thead>
+                                <tr class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100">
+                                    <th class="px-4 py-2 border">Tanggal</th>
+                                    <th class="px-4 py-2 border">Jenis</th>
+                                    <th class="px-4 py-2 border">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(App\Models\AjuanTabungan::where('user_id', $user->id)->where('status', 'success')->get() as $row)
+                                    <tr class="text-gray-800 dark:text-gray-100">
+                                        <td class="border px-4 py-2">{{ $row->created_at->format('d M Y') }}</td>
+                                        <td class="border px-4 py-2 capitalize">{{ $row->jenis }}</td>
+                                        <td class="border px-4 py-2">Rp{{ number_format($row->jumlah, 0, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     @endif
                 </div>
             </div>
         </div>
     </div>
+
 </x-app-layout>

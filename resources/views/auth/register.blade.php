@@ -38,14 +38,6 @@
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
-        <div>
-            <label for="role_id">Pilih Roles</label>
-            <select name="role_id" id="role_id" required>
-                @foreach ($roles as $role)
-                    <option value="{{ $role->id }}">{{ ucfirst($role->name) }}</option>
-                @endforeach
-            </select>
-        </div>
 
 
 
