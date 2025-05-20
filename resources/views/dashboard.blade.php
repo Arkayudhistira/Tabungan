@@ -18,7 +18,7 @@
                         <table class="w-full border border-gray-500 text-sm">
                             <thead class="bg-gray-700 text-white">
                                 <tr>
-                                    <th class="border p-2">polo</th>
+                                    <th class="border p-2">Nama</th>
                                     <th class="border p-2">Role</th>
                                     <th class="border p-2">Saldo</th>
                                 </tr>
@@ -44,7 +44,7 @@
                         <h2 class="text-xl font-bold mb-4">Dashboard Siswa</h2>
                         <p>Halo {{ $user->name }}! Saldo tabungan kamu saat ini:</p>
                         <p class="text-lg font-semibold mt-2">Rp{{ number_format($user->tabungan->sum('jumlah'), 0, ',', '.') }}</p>
-                        
+
                     @endif
                 </div>
             </div>
