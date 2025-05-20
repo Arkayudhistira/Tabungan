@@ -28,7 +28,7 @@
 
 
 @if ($user->role_id === 1) {{-- Admin --}}
-<h2 class="text-xl font-bold mb-4">Dashboard Admin Hitam</h2>
+<h2 class="text-xl font-bold mb-4">Dashboard Admin</h2>
 
 <table class="w-full border border-gray-500 text-sm mb-8">
     <thead class="bg-gray-700 text-white sticky top-0">
