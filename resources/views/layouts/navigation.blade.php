@@ -3,7 +3,7 @@
         <!-- Brand -->
         <a href="{{ url('/') }}" class="navbar-brand">
             <!-- Bisa diganti logo -->
-            <span class="navbar-brand-text">My Tabler Laravel</span>
+            <span class="navbar-brand-text ">ppasd</span>
         </a>
 
         <!-- Toggle button untuk responsive -->
