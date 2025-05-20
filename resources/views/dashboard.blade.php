@@ -18,7 +18,7 @@
                         <table class="w-full border border-gray-500 text-sm">
                             <thead class="bg-gray-700 text-white">
                                 <tr>
-                                    <th class="border p-2">Nama</th>
+                                    <th class="border p-2">polo</th>
                                     <th class="border p-2">Role</th>
                                     <th class="border p-2">Saldo</th>
                                 </tr>
